@@ -104,8 +104,12 @@ class imdb(object):
         widths = self._get_widths()
         for i in xrange(num_images):
             boxes = self.roidb[i]['boxes'].copy()
-            oldx1 = boxes[:, 0].copy()
-            oldx2 = boxes[:, 2].copy()
+            oldx1 = np.array(list(map(lambda x, width: min(max(x, 0), width),
+                                      boxes[:, 0].copy(),
+                                      [widths[i]] * len(boxes)) ))
+            oldx2 = np.array(list(map(lambda x, width: max(0, min(x, width)),
+                                      boxes[:, 2].copy(),
+                                      [widths[i]] * len(boxes)) ))
             boxes[:, 0] = widths[i] - oldx2 - 1
             boxes[:, 2] = widths[i] - oldx1 - 1
             assert (boxes[:, 2] >= boxes[:, 0]).all()
